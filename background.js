@@ -6,14 +6,31 @@ chrome.runtime.onInstalled.addListener(() => {
   });
 });
 
+let lastSel = [];
+chrome.tabs.onHighlighted.addListener(async () => {
+    const tabs = await chrome.tabs.query({ highlighted: true, currentWindow: true });
+    if (tabs.length > 1) {
+        lastSel = tabs;
+    } else if (tabs.length === 1 && lastSel.length > 0) {
+        const sel = lastSel.find(t => t.id === tabs[0].id);
+        if (!sel) {
+            lastSel = [];
+        }
+    }
+});
+
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === "addToGroup") {
-    await chrome.storage.local.set({
-      tempTab: {
-        url: tab.url,
-        title: tab.title
-      }
-    });
+    let tabs = await chrome.tabs.query({ highlighted: true, currentWindow: true });
+    if (tabs.length === 1 && lastSel.length > 1) {
+        const wasInSelection = lastSel.find(t => t.id === tabs[0].id);
+        if (wasInSelection) {
+            tabs = lastSel;
+        }
+    }
+
+    const tabData = tabs.map(t => ({ url: t.url, title: t.title }));
+    await chrome.storage.local.set({ tempTabs: tabData });
     chrome.windows.create({
       url: "selector.html",
       type: "popup",
@@ -25,12 +42,9 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 
 chrome.commands.onCommand.addListener(async (command, tab) => {
   if (command === "addToGroup") {
-    await chrome.storage.local.set({
-        tempTab: {
-            url: tab.url,
-            title: tab.title
-        }
-    });
+    const tabs = await chrome.tabs.query({ highlighted: true, currentWindow: true });
+    const tabData = tabs.map(t => ({ url: t.url, title: t.title }));
+    await chrome.storage.local.set({ tempTabs: tabData });
     chrome.windows.create({
         url: "selector.html",
         type: "popup",
@@ -48,4 +62,26 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
         height: 400
     });
   }
+});
+
+chrome.contextMenus.onClicked.addListener(async (info, tab) => {
+    if (!info.menuItemId.startsWith("group-")) return;
+    const groupId = info.menuItemId.replace("group-", "");
+    const data = await chrome.storage.local.get("groups");
+    const groups = data.groups || {};
+    if (!groups[groupId]) return;
+    const tabs = await chrome.tabs.query({
+        currentWindow: true,
+        highlighted: true
+    });
+    tabs.forEach(t => {
+        const exists = groups[groupId].tabs.some(x => x.url === t.url);
+        if (!exists) {
+        groups[groupId].tabs.push({
+            url: t.url,
+            title: t.title
+        });
+        }
+    });
+    await chrome.storage.local.set({ groups });
 });
