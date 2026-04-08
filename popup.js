@@ -46,12 +46,14 @@ async function loadGroups() {
   cunt.innerHTML = "";
   if (!groups || Array.isArray(groups)) return;
   Object.entries(groups).forEach(([id, group]) => {
+    const cuntin = document.createElement("div");
+
     const div = document.createElement("div");
     div.className = "groupItems";
 
     const btn = document.createElement("button");
     btn.className = "group-btn";
-    btn.textContent = group.name;
+    btn.textContent = `${group.name} (${group.tabs ? group.tabs.length : 0})`;
     btn.onclick = () => {
       const urls = group.tabs.map(t => t.url);
       if (urls.length > 0) {
@@ -66,6 +68,37 @@ async function loadGroups() {
       }
     };
 
+    const tabsDiv = document.createElement("div");
+    tabsDiv.className = "tabs-list";
+    tabsDiv.style.display = "none";
+    tabsDiv.style.marginBottom = "5px";
+    if (group.tabs.length > 0) {
+        group.tabs.forEach(t => {
+            const tabs = document.createElement("div");
+            tabs.textContent = "\u2022 " + (t.title || t.url);
+            Object.assign(tabs.style, {
+                fontSize: "12px",
+                marginLeft: "10px",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis"
+            });
+            tabsDiv.appendChild(tabs);
+        });
+    } else {
+        const noTabs = document.createElement("div");
+        noTabs.textContent = "No tabs in this group.";
+        noTabs.style.fontSize = "12px";
+        noTabs.style.marginLeft = "10px";
+        noTabs.style.color = "gray";
+        tabsDiv.appendChild(noTabs);
+    }
+
+    btn.oncontextmenu = (e) => {
+        e.preventDefault();
+        tabsDiv.style.display = tabsDiv.style.display === "none" ? "block" : "none";
+    };
+
     const delBtn = document.createElement("button");
     delBtn.className = "delete-btn";
     delBtn.textContent = "X";
@@ -75,8 +108,14 @@ async function loadGroups() {
     };
     div.appendChild(btn);
     div.appendChild(delBtn);
-    cunt.appendChild(div);
+    cuntin.appendChild(div);
+    cuntin.appendChild(tabsDiv);
+    cunt.appendChild(cuntin);
   });
+}
+
+async function showTabsList(id) {
+    
 }
 
 async function deleteGroup(id) {
