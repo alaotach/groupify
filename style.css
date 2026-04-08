@@ -45,3 +45,22 @@ body {
 .cunt input {
     flex-grow: 1;
 }
+
+.alert {
+    background-color: #ffebee;
+    border: 1px solid #ffcdd2;
+    color: #c62828;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+
+.alert {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
