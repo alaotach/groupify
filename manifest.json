@@ -9,5 +9,20 @@
     },
     "background": {
         "service_worker": "background.js"
+    },
+    "commands":
+    {
+        "_execute_action": {
+            "suggested_key": {
+                "default": "Alt+Shift+O"
+            },
+            "description": "Open the popup extension"
+        },
+        "addToGroup": {
+            "suggested_key": {
+                "default": "Alt+Shift+G"
+            },
+            "description": "Group tabs based on their content"
+        }
     }
 }

@@ -22,3 +22,20 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     });
   }
 });
+
+chrome.commands.onCommand.addListener(async (command, tab) => {
+  if (command === "addToGroup") {
+    await chrome.storage.local.set({
+        tempTab: {
+            url: tab.url,
+            title: tab.title
+        }
+    });
+    chrome.windows.create({
+        url: "selector.html",
+        type: "popup",
+        width: 300,
+        height: 400
+    })
+  }
+});
