@@ -23,6 +23,12 @@
                 "default": "Alt+Shift+G"
             },
             "description": "Group tabs based on their content"
+        },
+        "saveWindow": {
+            "suggested_key": {
+                "default": "Alt+Shift+S"
+            },
+            "description": "Save current window as group"
         }
     }
 }

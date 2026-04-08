@@ -36,6 +36,16 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
         type: "popup",
         width: 300,
         height: 400
-    })
+    });
+  } else if (command === "saveWindow") {
+    const tabs = await chrome.tabs.query({ currentWindow: true });
+    const tabData = tabs.map(t => ({ url: t.url, title: t.title }));
+    await chrome.storage.local.set({ tempWindowTabs: tabData });
+    chrome.windows.create({
+        url: "save_window.html",
+        type: "popup",
+        width: 300,
+        height: 400
+    });
   }
 });
