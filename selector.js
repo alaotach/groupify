@@ -10,7 +10,12 @@ async function loadGroups() {
     btn.textContent = group.name;
     btn.className = "group-btn";
     btn.onclick = async () => {
-      group.tabs.push(...tempTabs);
+      tempTabs.forEach(t => {
+        const e = group.tabs.some(x => x.url === t.url);
+        if (!e) {
+          group.tabs.push(t);
+        }
+      });
       await chrome.storage.local.set({ groups });
       window.close();
     };
