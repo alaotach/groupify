@@ -4,6 +4,12 @@
     "version": "1.0",
     "description": "A Chrome extension to group your tabs based on their content.",
     "permissions": ["activeTab", "scripting", "storage", "tabs", "contextMenus"],
+    "icons": {
+        "16": "icon.png",
+        "32": "icon.png",
+        "48": "icon.png",
+        "128": "icon.png"
+    },
     "action": {
         "default_popup": "popup.html"
     },
