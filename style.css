@@ -5,3 +5,43 @@ body {
     background-color: #f4f4f4;
     width: 250px;
 }
+
+.scrollable {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    background: white;
+    padding: 5px;
+}
+
+.groupItems {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.group-btn {
+    flex-grow: 1;
+    margin-right: 5px;
+    text-align: left;
+    padding: 5px;
+}
+
+.delete-btn {
+    color: white;
+    background-color: red;
+    border: none;
+    padding: 5px 8px;
+    cursor: pointer;
+}
+
+.cunt {
+    display: flex;
+    gap: 5px;
+}
+
+.cunt input {
+    flex-grow: 1;
+}

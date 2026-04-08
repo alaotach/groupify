@@ -7,7 +7,6 @@ document.getElementById("createGroup").addEventListener("click", async () => {
         const id = Date.now().toString();
         groups[id] = { name, tabs: [] };
         await chrome.storage.local.set({ groups });
-        alert("Group created!");
         location.reload();
     }
 });
@@ -19,7 +18,10 @@ async function loadGroups() {
   if (!groups || Array.isArray(groups)) return;
   Object.entries(groups).forEach(([id, group]) => {
     const div = document.createElement("div");
+    div.className = "groupItems";
+
     const btn = document.createElement("button");
+    btn.className = "group-btn";
     btn.textContent = group.name;
     btn.onclick = () => {
       const urls = group.tabs.map(t => t.url);
@@ -29,9 +31,24 @@ async function loadGroups() {
         alert("No tabs in this group.");
       }
     };
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "delete-btn";
+    delBtn.textContent = "X";
+    delBtn.onclick = async () => {
+      await deleteGroup(id);
+      location.reload();
+    };
     div.appendChild(btn);
+    div.appendChild(delBtn);
     cunt.appendChild(div);
   });
 }
+
+async function deleteGroup(id) {
+    const {groups} = await chrome.storage.local.get("groups");
+    delete groups[id];
+    await chrome.storage.local.set({ groups });
+};
 
 loadGroups();
