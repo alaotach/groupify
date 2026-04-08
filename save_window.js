@@ -1,3 +1,8 @@
+const alert = document.createElement("div");
+alert.className = "alert";
+alert.style.display = "none";
+document.body.insertBefore(alert, document.body.firstChild);
+
 document.getElementById("saveBtn").addEventListener("click", async () => {
     const name = document.getElementById("windowGroupName").value;
     if (name) {
@@ -5,6 +10,16 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
         let newGroups = groups;
         if (!newGroups || Array.isArray(newGroups)) newGroups = {};
         
+        if (Object.values(newGroups).some(g => g.name === name)) {
+            alert.style.display = "block";
+            alert.textContent = "A group with that name already exists.";
+            setTimeout(() => {
+                alert.textContent = "";
+                alert.style.display = "none";
+            }, 5000);
+            return;
+        }
+
         const id = Date.now().toString();
         newGroups[id] = { name, tabs: tempWindowTabs || [] };
         

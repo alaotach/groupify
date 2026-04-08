@@ -1,9 +1,38 @@
-chrome.runtime.onInstalled.addListener(() => {
+async function update() {
+  chrome.contextMenus.removeAll();
   chrome.contextMenus.create({
-    "id": "addToGroup",
-    "title": "Add tab to a group",
-    "contexts": ["page"]
+    id: "addToGroup",
+    title: "Add tab to a group",
+    contexts: ["page"]
   });
+
+  const data = await chrome.storage.local.get("groups");
+  const groups = data.groups || {};
+  if (!Array.isArray(groups)) {
+    Object.entries(groups).forEach(([id, group]) => {
+      chrome.contextMenus.create({
+        id: `group-${id}`,
+        parentId: "addToGroup",
+        title: group.name,
+        contexts: ["page"]
+      });
+    });
+  }
+
+  chrome.contextMenus.create({
+    id: "selectorOpen",
+    parentId: "addToGroup",
+    title: "Add to new group...",
+    contexts: ["page"]
+  });
+}
+
+chrome.runtime.onInstalled.addListener(update);
+chrome.runtime.onStartup.addListener(update);
+chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === "local" && changes.groups) {
+        update();
+    }
 });
 
 let lastSel = [];
@@ -20,8 +49,9 @@ chrome.tabs.onHighlighted.addListener(async () => {
 });
 
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
-  if (info.menuItemId === "addToGroup") {
+  if (info.menuItemId === "selectorOpen" || info.menuItemId === "addToGroup") {
     let tabs = await chrome.tabs.query({ highlighted: true, currentWindow: true });
+    
     if (tabs.length === 1 && lastSel.length > 1) {
         const wasInSelection = lastSel.find(t => t.id === tabs[0].id);
         if (wasInSelection) {
