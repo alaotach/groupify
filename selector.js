@@ -21,8 +21,9 @@ async function loadGroups() {
   if (sub) sub.textContent = `${tempTabs.length} Tab${tempTabs.length !== 1 ? 's' : ''} Selected`;
 
   const cunt = document.getElementById("groups");
+  if (!cunt) return;
   cunt.innerHTML = "";
-  
+
   const entries = Object.entries(groups);
   if (entries.length === 0) {
       const emptyState = document.createElement("div");
@@ -79,34 +80,77 @@ async function loadGroups() {
   });
 }
 
-document.getElementById("createeee").addEventListener("click", async () => {
-    const name = document.getElementById("newName").value.trim();
-    if (name) {
-        const d = await chrome.storage.local.get(["groups", "tempTabs"]);
-        let groups = d.groups;
-        if (!groups || Array.isArray(groups)) groups = {};
-        
-        if (Object.values(groups).some(g => g.name === name)) {
-            alertBox.style.display = "block";
-            alertBox.textContent = "A group with that name already exists.";
-            setTimeout(() => {
-                alertBox.textContent = "";
-                alertBox.style.display = "none";
-            }, 2500);
-            return;
+const createBtn = document.getElementById("createeee");
+if (createBtn) {
+    createBtn.addEventListener("click", async () => {    
+        const nameInput = document.getElementById("newName");
+        const name = nameInput ? nameInput.value.trim() : "";
+        if (name) {
+            const d = await chrome.storage.local.get(["groups", "tempTabs"]);       
+            let groups = d.groups;
+            if (!groups || Array.isArray(groups)) groups = {};
+
+            if (Object.values(groups).some(g => g.name === name)) {
+                alertBox.style.display = "block";
+                alertBox.textContent = "A group with that name already exists.";    
+                setTimeout(() => {
+                    alertBox.textContent = "";
+                    alertBox.style.display = "none";
+                }, 2500);
+                return;
+            }
+
+            const tempTabs = d.tempTabs || [];
+            const id = Date.now().toString();
+            groups[id] = { name, tabs: tempTabs };
+            await chrome.storage.local.set({ groups });
+            window.close();
         }
+    });
+}
 
-        const tempTabs = d.tempTabs || [];
-        const id = Date.now().toString();
-        groups[id] = { name, tabs: tempTabs };
-        await chrome.storage.local.set({ groups });
-        window.close();
+const newNameInput = document.getElementById("newName");
+if (newNameInput) {
+    newNameInput.addEventListener("keypress", (e) => {        
+        if (e.key === "Enter") {
+            const btn = document.getElementById("createeee");
+            if (btn) btn.click();
+        }
+    });
+}
+
+const searchInput = document.getElementById("searchInput");
+if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+        const query = e.target.value.toLowerCase();
+        const items = document.querySelectorAll("#groups > .groupItems, #groups > .empty-state");
+        items.forEach(item => {
+            if (item.classList.contains("empty-state")) {
+                item.style.display = query ? "none" : "";
+                return;
+            }
+            const nameEl = item.querySelector(".group-name");
+            if (nameEl) {
+                if (nameEl.textContent.toLowerCase().includes(query)) {
+                    item.style.display = "";
+                } else {
+                    item.style.display = "none";
+                }
+            }
+        });
+    });
+}
+
+document.addEventListener("keydown", (e) => {
+    if (e.key === "/" && (!document.activeElement || document.activeElement.tagName !== "INPUT")) {
+        e.preventDefault();
+        if (searchInput) searchInput.focus();
+        return;
     }
-});
-
-document.getElementById("newName").addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-        document.getElementById("createeee").click();
+    
+    if (document.activeElement && document.activeElement.tagName !== "INPUT" && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const newNameInput = document.getElementById("newName");
+        if (newNameInput) newNameInput.focus();
     }
 });
 

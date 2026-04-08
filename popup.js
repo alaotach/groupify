@@ -11,77 +11,118 @@ function getColorClass(name) {
   return COLORS[Math.abs(hash) % COLORS.length];
 }
 
-document.getElementById("groupName").addEventListener("keypress", (e) => {
-    if (e.key === "Enter") {
-        document.getElementById("createGroup").click();
-    }
-});
+const groupNameInput = document.getElementById("groupName");
+if (groupNameInput) {
+    groupNameInput.addEventListener("keypress", (e) => {      
+        if (e.key === "Enter") {
+            const btn = document.getElementById("createGroup");
+            if (btn) btn.click();
+        }
+    });
+}
 
 document.addEventListener("keydown", (e) => {
-    if (!document.getElementById("groupName").matches(":focus")) {
-        document.getElementById("groupName").focus();
+    if (e.key === "/" && (!document.activeElement || document.activeElement.tagName !== "INPUT")) {
+        e.preventDefault();
+        const searchInput = document.getElementById("searchInput");
+        if (searchInput) searchInput.focus();
+        return;
+    }
+    
+    if (document.activeElement && document.activeElement.tagName !== "INPUT" && e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey) {
+        const groupNameInput = document.getElementById("groupName");
+        if (groupNameInput) groupNameInput.focus();
     }
 });
 
+const searchInput = document.getElementById("searchInput");
+if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+        const query = e.target.value.toLowerCase();
+        const items = document.querySelectorAll("#groups > div");
+        items.forEach(item => {
+            if (item.classList.contains("empty-state")) {
+                item.style.display = query ? "none" : "";
+                return;
+            }
+            const nameEl = item.querySelector(".group-name");
+            if (nameEl) {
+                if (nameEl.textContent.toLowerCase().includes(query)) {
+                    item.style.display = "";
+                } else {
+                    item.style.display = "none";
+                }
+            }
+        });
+    });
+}
 
-document.getElementById("createGroup").addEventListener("click", async () => {
-    const name = document.getElementById("groupName").value.trim();
-    if (name) {
-        const d = await chrome.storage.local.get("groups");
-        let groups = d.groups;
-        if (!groups || Array.isArray(groups)) groups = {};
-        if (Object.values(groups).some(g => g.name === name)) {
+
+const createGroupBtn = document.getElementById("createGroup");
+if (createGroupBtn) {
+    createGroupBtn.addEventListener("click", async () => {  
+        const name = document.getElementById("groupName").value.trim();
+        if (name) {
+            const d = await chrome.storage.local.get("groups");
+            let groups = d.groups;
+            if (!groups || Array.isArray(groups)) groups = {};
+            if (Object.values(groups).some(g => g.name === name)) {
+                alert.style.display = "block";
+                alert.textContent = "A group with that name already exists.";
+                setTimeout(() => {
+                    alert.textContent = "";
+                    alert.style.display = "none";
+                }, 5000);
+                return;
+            }
+            const id = Date.now().toString();
+            groups[id] = { name, tabs: [] };
+            await chrome.storage.local.set({ groups });
+            document.getElementById('groupName').value = '';
+            loadGroups();
+        }
+    });
+}
+
+const saveBtn = document.getElementById("saveBtn");
+if (saveBtn) {
+    saveBtn.addEventListener("click", async () => {      
+        const name = document.getElementById("groupName").value.trim();
+        if (name) {
+            const d = await chrome.storage.local.get("groups");
+            let groups = d.groups;
+            if (!groups || Array.isArray(groups)) groups = {};
+            if (Object.values(groups).some(g => g.name === name)) {
+                alert.style.display = "block";
+                alert.textContent = "A group with that name already exists.";
+                setTimeout(() => {
+                    alert.textContent = "";
+                    alert.style.display = "none";
+                }, 5000);
+                return;
+            }
+            const tabs = await chrome.tabs.query({ currentWindow: true });
+            const tabData = tabs.map(t => ({ url: t.url, title: t.title }));        
+            const id = Date.now().toString();
+            groups[id] = { name, tabs: tabData };
+            await chrome.storage.local.set({ groups });
+            document.getElementById('groupName').value = '';
+            loadGroups();
+        } else {
             alert.style.display = "block";
-            alert.textContent = "A group with that name already exists.";
+            alert.textContent = "Please enter a group name first.";
             setTimeout(() => {
                 alert.textContent = "";
                 alert.style.display = "none";
             }, 5000);
-            return;
         }
-        const id = Date.now().toString();
-        groups[id] = { name, tabs: [] };
-        await chrome.storage.local.set({ groups });
-        document.getElementById('groupName').value = '';
-        loadGroups();
-    }
-});
-
-document.getElementById("saveBtn").addEventListener("click", async () => {
-    const name = document.getElementById("groupName").value.trim();
-    if (name) {
-        const d = await chrome.storage.local.get("groups");
-        let groups = d.groups;
-        if (!groups || Array.isArray(groups)) groups = {};
-        if (Object.values(groups).some(g => g.name === name)) {
-            alert.style.display = "block";
-            alert.textContent = "A group with that name already exists.";
-            setTimeout(() => {
-                alert.textContent = "";
-                alert.style.display = "none";
-            }, 5000);
-            return;
-        }
-        const tabs = await chrome.tabs.query({ currentWindow: true });
-        const tabData = tabs.map(t => ({ url: t.url, title: t.title }));
-        const id = Date.now().toString();
-        groups[id] = { name, tabs: tabData };
-        await chrome.storage.local.set({ groups });
-        document.getElementById('groupName').value = '';
-        loadGroups();
-    } else {
-        alert.style.display = "block";
-        alert.textContent = "Please enter a group name first.";
-        setTimeout(() => {
-            alert.textContent = "";
-            alert.style.display = "none";
-        }, 5000);
-    }
-});
+    });
+}
 
 async function loadGroups() {
   const { groups } = await chrome.storage.local.get("groups");
   const cunt = document.getElementById("groups");
+  if (!cunt) return;
   cunt.innerHTML = "";
   const groupCountEl = document.getElementById("groupCount");
   

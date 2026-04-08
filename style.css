@@ -315,3 +315,15 @@ button#saveWindow:hover { background: #ececec; }
 #saveBtn { width: 100%; }
 .scrollable > * { flex-shrink: 0 !important; }
 
+#searchInput {
+  width: 100%; 
+  box-sizing: border-box; 
+  outline: none; 
+  border: 1px solid #e4e4e4; 
+  border-radius: 8px; 
+  padding: 10px 14px; 
+  font-family: 'DM Sans', sans-serif; 
+  font-size: 13.5px; 
+  background: #fafafa; 
+  color: #111;
+}
