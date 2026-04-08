@@ -64,8 +64,8 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     chrome.windows.create({
       url: "selector.html",
       type: "popup",
-      width: 300,
-      height: 400
+      width: 350,
+      height: 500
     });
   }
 });
@@ -78,8 +78,8 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
     chrome.windows.create({
         url: "selector.html",
         type: "popup",
-        width: 300,
-        height: 400
+        width: 350,
+        height: 500
     });
   } else if (command === "saveWindow") {
     const tabs = await chrome.tabs.query({ currentWindow: true });
@@ -88,8 +88,8 @@ chrome.commands.onCommand.addListener(async (command, tab) => {
     chrome.windows.create({
         url: "save_window.html",
         type: "popup",
-        width: 300,
-        height: 400
+        width: 350,
+        height: 500
     });
   }
 });

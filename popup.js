@@ -1,10 +1,15 @@
 const alert = document.createElement("div");
 alert.className = "alert";
+alert.style.display = "none";
 document.body.appendChild(alert);
 
-setTimeout(() => {
-    alert.textContent = "";
-}, 5000);
+const COLORS = ['ic-0','ic-1','ic-2','ic-3','ic-4','ic-5'];
+
+function getColorClass(name) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  return COLORS[Math.abs(hash) % COLORS.length];
+}
 
 document.getElementById("groupName").addEventListener("keypress", (e) => {
     if (e.key === "Enter") {
@@ -20,7 +25,7 @@ document.addEventListener("keydown", (e) => {
 
 
 document.getElementById("createGroup").addEventListener("click", async () => {
-    const name = document.getElementById("groupName").value;
+    const name = document.getElementById("groupName").value.trim();
     if (name) {
         const d = await chrome.storage.local.get("groups");
         let groups = d.groups;
@@ -37,12 +42,13 @@ document.getElementById("createGroup").addEventListener("click", async () => {
         const id = Date.now().toString();
         groups[id] = { name, tabs: [] };
         await chrome.storage.local.set({ groups });
-        location.reload();
+        document.getElementById('groupName').value = '';
+        loadGroups();
     }
 });
 
 document.getElementById("saveBtn").addEventListener("click", async () => {
-    const name = document.getElementById("groupName").value;
+    const name = document.getElementById("groupName").value.trim();
     if (name) {
         const d = await chrome.storage.local.get("groups");
         let groups = d.groups;
@@ -61,7 +67,8 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
         const id = Date.now().toString();
         groups[id] = { name, tabs: tabData };
         await chrome.storage.local.set({ groups });
-        location.reload();
+        document.getElementById('groupName').value = '';
+        loadGroups();
     } else {
         alert.style.display = "block";
         alert.textContent = "Please enter a group name first.";
@@ -76,16 +83,53 @@ async function loadGroups() {
   const { groups } = await chrome.storage.local.get("groups");
   const cunt = document.getElementById("groups");
   cunt.innerHTML = "";
-  if (!groups || Array.isArray(groups)) return;
-  Object.entries(groups).forEach(([id, group]) => {
+  const groupCountEl = document.getElementById("groupCount");
+  
+  if (!groups || Array.isArray(groups) || Object.keys(groups).length === 0) {
+    if (groupCountEl) groupCountEl.textContent = "0 Groups";
+    const emptyState = document.createElement("div");
+    emptyState.className = "empty-state";
+    emptyState.textContent = "No groups yet. Create one below.";
+    cunt.appendChild(emptyState);
+    return;
+  }
+  
+  const entries = Object.entries(groups);
+  if (groupCountEl) groupCountEl.textContent = `${entries.length} Group${entries.length !== 1 ? 's' : ''}`;
+
+  entries.forEach(([id, group]) => {
     const cuntin = document.createElement("div");
 
     const div = document.createElement("div");
     div.className = "groupItems";
+    
+    const icon = document.createElement('div');
+    icon.className = `group-icon ${getColorClass(group.name)}`;
+    icon.textContent = group.name.charAt(0).toUpperCase();
+
+    const info = document.createElement('div');
+    info.className = 'group-info';
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'group-name';
+    nameEl.textContent = group.name;
+
+    const countEl = document.createElement('div');
+    countEl.className = 'group-count';
+    const cnt = group.tabs ? group.tabs.length : 0;
+    countEl.textContent = `${cnt} tab${cnt !== 1 ? 's' : ''}`;
+
+    info.appendChild(nameEl);
+    info.appendChild(countEl);
+
+    const left = document.createElement('div');
+    left.className = 'group-left';
+    left.appendChild(icon);
+    left.appendChild(info);
 
     const btn = document.createElement("button");
     btn.className = "group-btn";
-    btn.textContent = `${group.name} (${group.tabs ? group.tabs.length : 0})`;
+    btn.appendChild(left);
     btn.onclick = () => {
       const urls = group.tabs.map(t => t.url);
       if (urls.length > 0) {
@@ -100,6 +144,31 @@ async function loadGroups() {
             return;
       }
     };
+
+    const actions = document.createElement('div');
+    actions.className = 'group-actions';
+
+    const eyeBtn = document.createElement('button');
+    eyeBtn.className = 'icon-btn';
+    eyeBtn.innerHTML = `<svg width="13" height="13" viewBox="0 0 16 16" fill="none">
+      <path d="M2 8s2.5-5 6-5 6 5 6 5-2.5 5-6 5-6-5-6-5z" stroke="currentColor" stroke-width="1.4"/>
+      <circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/>
+    </svg>`;
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "icon-btn del";
+    delBtn.innerHTML = `<svg width="11" height="11" viewBox="0 0 16 16" fill="none">
+      <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+    </svg>`;
+    
+    delBtn.onclick = async (e) => {
+      e.stopPropagation();
+      await deleteGroup(id);
+      loadGroups();
+    };
+    
+    actions.appendChild(eyeBtn);
+    actions.appendChild(delBtn);
 
     const tabsDiv = document.createElement("div");
     tabsDiv.className = "tabs-list";
@@ -131,16 +200,14 @@ async function loadGroups() {
         e.preventDefault();
         tabsDiv.style.display = tabsDiv.style.display === "none" ? "block" : "none";
     };
-
-    const delBtn = document.createElement("button");
-    delBtn.className = "delete-btn";
-    delBtn.textContent = "X";
-    delBtn.onclick = async () => {
-      await deleteGroup(id);
-      location.reload();
+    
+    eyeBtn.onclick = (e) => {
+        e.stopPropagation();
+        tabsDiv.style.display = tabsDiv.style.display === "none" ? "block" : "none";
     };
+
     div.appendChild(btn);
-    div.appendChild(delBtn);
+    div.appendChild(actions);
     cuntin.appendChild(div);
     cuntin.appendChild(tabsDiv);
     cunt.appendChild(cuntin);

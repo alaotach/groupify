@@ -1,19 +1,32 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Tab Groups</title>
-        <link rel="stylesheet" href="style.css">
-    </head>
-    <body>
-        <h3>Groups</h3>
-        <div id="groups" class="scrollable"></div>
-
-        <div class="cunt">
-            <input type="text" id="groupName" placeholder="New group name" />
-            <button id="createGroup">Create</button>
+<head>
+    <title>Tab Groups</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="popup-body">
+    <div class="header">
+        <span class="htitle">Tab Groups</span>
+        <span class="groupBadge" id="groupCount">0 Groups</span>
+    </div>
+    
+    <div class="scrollable" id="groups"></div>
+    
+    <div class="footer">
+        <div class="cuntin" style="margin-bottom: 8px;">
+            <input type="text" id="groupName" class="cuntinput" placeholder="New group name..." />
+            <button id="createGroup" class="actionBtn primaryBtn">Create</button>
         </div>
-        <button id="saveBtn">Save Window</button>
-
-        <script src="popup.js"></script>
-    </body>
+        <button id="saveBtn" class="actionBtn secondaryBtn">
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="margin-right: 6px;">
+                <path d="M2 4a2 2 0 012-2h6l4 4v6a2 2 0 01-2 2H4a2 2 0 01-2-2V4z" stroke="currentColor" stroke-width="1.4"/>
+                <path d="M10 2v3H5.5V2M5 10h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            </svg>
+            Save Window
+        </button>
+    </div>
+    
+    <script src="popup.js"></script>
+</body>
 </html>

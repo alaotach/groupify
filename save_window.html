@@ -2,17 +2,32 @@
 <html>
 <head>
     <title>Save Window</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
     <style>
-        body { width: 250px; text-align: center; }
-        input { width: 90%; margin-bottom: 10px; padding: 5px; }
-        button { width: 90%; padding: 5px; cursor: pointer; }
+        .popup-body-mini {
+          display: flex;
+          flex-direction: column;
+          padding: 15px;
+          width: 320px;
+          height: auto;
+          overflow: hidden;
+        }
     </style>
 </head>
-<body>
-    <h3>Save Window As Group</h3>
-    <input type="text" id="windowGroupName" placeholder="Enter group name..." autofocus />
-    <button id="saveBtn">Save & Close</button>
+<body class="popup-body-mini">
+    <div class="header">
+        <span class="htitle">Save Window</span>
+        <span class="groupBadge" id="tabCount"></span>
+    </div>
+
+    <div class="footer" style="padding-top: 0">
+        <div class="cuntin" style="margin-bottom: 8px;">
+            <input type="text" id="windowGroupName" class="cuntinput" placeholder="Enter group name..." autofocus />
+            <button id="saveBtn" class="actionBtn primaryBtn">Save</button>
+        </div>
+    </div>
+
     <script src="save_window.js"></script>
 </body>
 </html>

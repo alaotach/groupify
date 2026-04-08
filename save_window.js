@@ -4,7 +4,7 @@ alert.style.display = "none";
 document.body.insertBefore(alert, document.body.firstChild);
 
 document.getElementById("saveBtn").addEventListener("click", async () => {
-    const name = document.getElementById("windowGroupName").value;
+    const name = document.getElementById("windowGroupName").value.trim();
     if (name) {
         const { groups, tempWindowTabs } = await chrome.storage.local.get(["groups", "tempWindowTabs"]);
         let newGroups = groups;
@@ -35,3 +35,12 @@ document.getElementById("windowGroupName").addEventListener("keypress", (e) => {
         document.getElementById("saveBtn").click();
     }
 });
+
+async function init() {
+  const { tempWindowTabs } = await chrome.storage.local.get(["tempWindowTabs"]);
+  const sub = document.getElementById("tabCount");
+  const cnt = tempWindowTabs ? tempWindowTabs.length : 0;
+  if (sub) sub.textContent = `${cnt} Window Tab${cnt !== 1 ? 's' : ''}`;
+}
+
+init();
