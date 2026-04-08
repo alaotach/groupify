@@ -6,6 +6,19 @@ setTimeout(() => {
     alert.textContent = "";
 }, 5000);
 
+document.getElementById("groupName").addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+        document.getElementById("createGroup").click();
+    }
+});
+
+document.addEventListener("keydown", (e) => {
+    if (!document.getElementById("groupName").matches(":focus")) {
+        document.getElementById("groupName").focus();
+    }
+});
+
+
 document.getElementById("createGroup").addEventListener("click", async () => {
     const name = document.getElementById("groupName").value;
     if (name) {
