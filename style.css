@@ -296,6 +296,60 @@ button#saveWindow {
 
 button#saveWindow:hover { background: #ececec; }
 
+.shortcuts-page {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #ffffff;
+  z-index: 100;
+  padding: 15px;
+}
+
+.shortcuts-page .header { margin-bottom: 5px; }
+
+.hdr-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.small-icn {
+  width: 24px;
+  height: 24px;
+}
+
+.s-scroll {
+  padding-top: 10px;
+  margin-bottom: 0;
+  border: none;
+  overflow-y: auto;
+}
+
+.s-item {
+  font-size: 12.5px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.s-item span {
+  color: #444;
+}
+
+kbd {
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 2px 6px;
+  font-family: monospace;
+  font-size: 11px;
+}
+
 .alert {
   position: fixed;
   bottom: 0px;

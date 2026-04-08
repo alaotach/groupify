@@ -35,6 +35,19 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
+const sBtn = document.getElementById("sBtn");
+const cBtn = document.getElementById("cBtn");
+const sPg = document.getElementById("sPg");
+
+if (sBtn && cBtn && sPg) {
+    sBtn.addEventListener("click", () => {
+        sPg.style.display = "flex";
+    });
+    cBtn.addEventListener("click", () => {
+        sPg.style.display = "none";
+    });
+}
+
 const searchInput = document.getElementById("searchInput");
 if (searchInput) {
     searchInput.addEventListener("input", (e) => {
