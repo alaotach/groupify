@@ -28,7 +28,7 @@ document.getElementById("createGroup").addEventListener("click", async () => {
         if (Object.values(groups).some(g => g.name === name)) {
             alert.style.display = "block";
             alert.textContent = "A group with that name already exists.";
-            setInterval(() => {
+            setTimeout(() => {
                 alert.textContent = "";
                 alert.style.display = "none";
             }, 5000);
@@ -50,7 +50,7 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
         if (Object.values(groups).some(g => g.name === name)) {
             alert.style.display = "block";
             alert.textContent = "A group with that name already exists.";
-            setInterval(() => {
+            setTimeout(() => {
                 alert.textContent = "";
                 alert.style.display = "none";
             }, 5000);
@@ -65,7 +65,7 @@ document.getElementById("saveBtn").addEventListener("click", async () => {
     } else {
         alert.style.display = "block";
         alert.textContent = "Please enter a group name first.";
-        setInterval(() => {
+        setTimeout(() => {
             alert.textContent = "";
             alert.style.display = "none";
         }, 5000);
@@ -93,7 +93,7 @@ async function loadGroups() {
       } else {
         alert.style.display = "block";
         alert.textContent = "No tabs in this group.";
-        setInterval(() => {
+        setTimeout(() => {
                 alert.textContent = "";
                 alert.style.display = "none";
             }, 5000);
